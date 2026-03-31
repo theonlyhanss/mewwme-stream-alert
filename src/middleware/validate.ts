@@ -33,7 +33,7 @@ export function validateStreamerBody(
   if (!isPlatformSupported(normalizedPlatform)) {
     validationError(
       res,
-      `Unsupported platform '${platform}'. Allowed: twitch, youtube, tiktok, kick, rumble`,
+      `Unsupported platform '${platform}'. Allowed: twitch, youtube, tiktok`,
     );
     return;
   }

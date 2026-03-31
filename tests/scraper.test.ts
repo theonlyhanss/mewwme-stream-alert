@@ -141,8 +141,8 @@ describe("Platform Checker Registry", () => {
     expect(isPlatformSupported("twitch")).toBe(true);
     expect(isPlatformSupported("youtube")).toBe(true);
     expect(isPlatformSupported("tiktok")).toBe(true);
-    expect(isPlatformSupported("kick")).toBe(true);
-    expect(isPlatformSupported("rumble")).toBe(true);
+    expect(isPlatformSupported("kick")).toBe(false);
+    expect(isPlatformSupported("rumble")).toBe(false);
     expect(isPlatformSupported("facebook")).toBe(false);
     expect(isPlatformSupported("")).toBe(false);
   });

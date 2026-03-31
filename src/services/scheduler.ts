@@ -148,9 +148,9 @@ async function processStreamer(streamer: StoredStreamer): Promise<void> {
       inactiveDays: Math.max(0, inactiveDays),
     });
   } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error);
     logger.error(
-      `Error processing ${streamer.platform}:${streamer.username}:`,
-      error,
+      `Error processing ${streamer.platform}:${streamer.username}: ${errMsg}`,
     );
 
     // Still update lastCheckedAt to prevent hammering on errors

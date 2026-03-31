@@ -68,7 +68,16 @@ export async function createStreamer(
     logger.info(`Created streamer: ${platform}:${username} for user ${userId}`);
 
     res.status(201).json({ streamer });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle unique constraint violation (race condition: two concurrent creates)
+    if (error?.code === "P2002") {
+      const existing = await storage.findStreamerByUnique(platform, username, userId);
+      res.status(409).json({
+        error: "Streamer already tracked",
+        streamer: existing,
+      });
+      return;
+    }
     logger.error("Error creating streamer:", error);
     res.status(500).json({ error: "Internal server error" });
   }

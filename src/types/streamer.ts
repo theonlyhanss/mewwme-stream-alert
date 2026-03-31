@@ -1,7 +1,7 @@
 /**
  * Supported streaming platforms
  */
-export type Platform = "kick" | "twitch" | "youtube" | "rumble" | "tiktok";
+export type Platform = "twitch" | "youtube" | "tiktok";
 
 /**
  * Live status returned by platform checkers

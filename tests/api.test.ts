@@ -175,13 +175,13 @@ describe("POST /streamers", () => {
       .post("/streamers")
       .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
-        platform: "KICK",
+        platform: "TWITCH",
         username: "UpperCaseUser",
         userId: "test_user_2",
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.streamer.platform).toBe("kick");
+    expect(res.body.streamer.platform).toBe("twitch");
     expect(res.body.streamer.username).toBe("uppercaseuser");
   });
 });

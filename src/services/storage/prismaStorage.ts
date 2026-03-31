@@ -21,6 +21,7 @@ interface PrismaEventRow {
   thumbnail: string | null;
   profileImage: string | null;
   url: string | null;
+  notifiedGuilds: unknown;
   startedAt: Date;
   createdAt: Date;
 }
@@ -153,6 +154,7 @@ export class PrismaStorage implements IStorage {
         thumbnail: e.thumbnail,
         profileImage: e.profileImage,
         url: e.url,
+        notifiedGuilds: Array.isArray(e.notifiedGuilds) ? e.notifiedGuilds as string[] : JSON.parse((e.notifiedGuilds as string) || "[]"),
         startedAt: e.startedAt.toISOString(),
         createdAt: e.createdAt.toISOString(),
       })),

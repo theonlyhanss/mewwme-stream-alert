@@ -4,7 +4,7 @@
 
 **Real-time stream monitoring API for Discord bots.**
 
-Detects when streamers go live across 5 platforms and delivers instant alerts to Discord channels.
+Detects when streamers go live across 3 platforms and delivers instant alerts to Discord channels.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org/)
@@ -17,8 +17,6 @@ Detects when streamers go live across 5 platforms and delivers instant alerts to
 [![Twitch](https://img.shields.io/badge/Twitch-9146FF?logo=twitch&logoColor=white)](#)
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white)](#)
 [![TikTok](https://img.shields.io/badge/TikTok-000000?logo=tiktok&logoColor=white)](#)
-[![Kick](https://img.shields.io/badge/Kick-53FC18?logo=kick&logoColor=black)](#)
-[![Rumble](https://img.shields.io/badge/Rumble-85C742?logo=rumble&logoColor=white)](#)
 
 [Features](#features) | [Quick Start](#quick-start) | [Deploy](#deployment) | [API Docs](#api-reference) | [Fork Guide](#forking-guide)
 
@@ -30,7 +28,7 @@ Detects when streamers go live across 5 platforms and delivers instant alerts to
 
 | Feature | Description |
 |---------|-------------|
-| **5 Platforms** | Twitch, YouTube, TikTok, Kick, Rumble |
+| **3 Platforms** | Twitch, YouTube, TikTok |
 | **Smart Scheduler** | Dynamic intervals based on streamer activity |
 | **Dual Storage** | JSON files (dev) / Prisma MySQL (prod) |
 | **Idempotent Alerts** | Restarts never cause duplicate notifications |
@@ -95,7 +93,7 @@ Detects when streamers go live across 5 platforms and delivers instant alerts to
 +-----------------------------+-------------------------------+
                               |
 +-----------------------------v-------------------------------+
-|  Scheduler + Scrapers: Twitch, YouTube, TikTok, Kick, Rumble|
+|  Scheduler + Scrapers: Twitch, YouTube, TikTok             |
 +-------------------------------------------------------------+
 ```
 
@@ -321,8 +319,6 @@ Development mode: all streamers checked every **60 seconds**.
 | Twitch | GraphQL API | Title, viewers, game, thumbnail |
 | YouTube | HTML (`ytInitialData`) | Title, viewers, thumbnail |
 | TikTok | HTML (`SIGI_STATE`) | Title, viewers, avatar |
-| Kick | REST API | Title, viewers, category |
-| Rumble | HTML scraping | Title, viewers, thumbnail |
 
 Anti rate-limit: UA rotation (12+ strings), 500-1500ms random delay, 3 retries with backoff.
 
@@ -384,7 +380,7 @@ mewwme-stream-alert/
 |   |   +-- validate.ts
 |   +-- services/
 |   |   +-- scheduler.ts
-|   |   +-- scraper/             # twitch, youtube, tiktok, kick, rumble
+|   |   +-- scraper/             # twitch, youtube, tiktok
 |   |   +-- storage/             # interface, jsonStorage, prismaStorage
 |   +-- utils/logger.ts
 +-- tests/

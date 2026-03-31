@@ -296,12 +296,12 @@ describe("JSON Storage (Development Mode)", () => {
   it("should create and list streamers", async () => {
     await storage.createUser("json_list_user");
     const streamer = await storage.createStreamer({
-      platform: "kick",
-      username: "json_test_kick",
+      platform: "twitch",
+      username: "json_test_twitch",
       userId: "json_list_user",
     });
 
-    expect(streamer.platform).toBe("kick");
+    expect(streamer.platform).toBe("twitch");
     expect(streamer.id).toBeDefined();
 
     const result = await storage.findStreamers(
@@ -310,7 +310,7 @@ describe("JSON Storage (Development Mode)", () => {
     );
 
     expect(result.items.length).toBeGreaterThanOrEqual(1);
-    const found = result.items.find((s) => s.username === "json_test_kick");
+    const found = result.items.find((s) => s.username === "json_test_twitch");
     expect(found).toBeDefined();
   });
 
@@ -358,14 +358,14 @@ describe("JSON Storage (Development Mode)", () => {
   it("should detect duplicates via findStreamerByUnique", async () => {
     await storage.createUser("json_dup_user");
     await storage.createStreamer({
-      platform: "rumble",
+      platform: "youtube",
       username: "json_dup_test",
       userId: "json_dup_user",
     });
 
-    const dup = await storage.findStreamerByUnique("rumble", "json_dup_test", "json_dup_user");
+    const dup = await storage.findStreamerByUnique("youtube", "json_dup_test", "json_dup_user");
     expect(dup).toBeDefined();
-    expect(dup!.platform).toBe("rumble");
+    expect(dup!.platform).toBe("youtube");
   });
 
   it("should paginate correctly", async () => {
