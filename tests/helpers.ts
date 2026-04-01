@@ -14,8 +14,6 @@ export const TEST_DATA_DIR = join(__dirname, "..", "data_test");
 
 // ─── Set env BEFORE any app imports ───
 process.env.NODE_ENV = "development";
-process.env.ADMIN_API_KEY = "test_admin_key_12345";
-process.env.BOT_API_KEY = "test_bot_key_67890";
 process.env.DISABLE_IP_WHITELIST = "true";
 process.env.ALLOWED_ORIGINS = "http://localhost:3000";
 process.env.LOG_LEVEL = "error"; // suppress logs during tests

@@ -12,8 +12,6 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 
 // ─── Set env before imports ───
 process.env.NODE_ENV = "development";
-process.env.ADMIN_API_KEY = "test_admin_key";
-process.env.BOT_API_KEY = "test_bot_key";
 process.env.DISABLE_IP_WHITELIST = "true";
 process.env.LOG_LEVEL = "error";
 

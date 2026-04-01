@@ -28,14 +28,6 @@ async function main(): Promise<void> {
     }
   }
 
-  if (!process.env.ADMIN_API_KEY) {
-    logger.warn("ADMIN_API_KEY is not set - admin endpoints will be inaccessible");
-  }
-
-  if (!process.env.BOT_API_KEY) {
-    logger.warn("BOT_API_KEY is not set - bot endpoints will be inaccessible");
-  }
-
   // Step 1: Initialize storage
   try {
     await initStorage();

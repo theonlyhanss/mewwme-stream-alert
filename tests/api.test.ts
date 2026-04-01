@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API Endpoint Tests
  *
  * Tests all REST endpoints:
@@ -15,8 +15,6 @@ import request from "supertest";
 
 // ─── Set env before any imports ───
 process.env.NODE_ENV = "development";
-process.env.ADMIN_API_KEY = "test_admin_key_12345";
-process.env.BOT_API_KEY = "test_bot_key_67890";
 process.env.DISABLE_IP_WHITELIST = "true";
 process.env.LOG_LEVEL = "error";
 
@@ -64,7 +62,6 @@ describe("POST /streamers", () => {
   it("should create a streamer with valid admin key", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "teststreamer",
@@ -83,7 +80,6 @@ describe("POST /streamers", () => {
   it("should reject duplicate streamer (409)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "teststreamer",
@@ -97,7 +93,6 @@ describe("POST /streamers", () => {
   it("should reject missing platform (400)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         username: "testuser",
         userId: "test_user_1",
@@ -109,7 +104,6 @@ describe("POST /streamers", () => {
   it("should reject unsupported platform (400)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "facebook",
         username: "testuser",
@@ -123,7 +117,6 @@ describe("POST /streamers", () => {
   it("should reject missing username (400)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         userId: "test_user_1",
@@ -135,7 +128,6 @@ describe("POST /streamers", () => {
   it("should reject invalid username characters (400)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "test user!@#",
@@ -148,7 +140,6 @@ describe("POST /streamers", () => {
   it("should reject missing userId (400)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "testuser2",
@@ -160,7 +151,6 @@ describe("POST /streamers", () => {
   it("should reject bot key (403)", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`)
       .send({
         platform: "twitch",
         username: "testuser3",
@@ -173,7 +163,6 @@ describe("POST /streamers", () => {
   it("should normalize platform and username to lowercase", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "TWITCH",
         username: "UpperCaseUser",
@@ -193,8 +182,7 @@ describe("POST /streamers", () => {
 describe("GET /streamers", () => {
   it("should list streamers with admin key", async () => {
     const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/streamers");
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.streamers)).toBe(true);
@@ -205,8 +193,7 @@ describe("GET /streamers", () => {
 
   it("should list streamers with bot key", async () => {
     const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`);
+      .get("/streamers");
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.streamers)).toBe(true);
@@ -214,8 +201,7 @@ describe("GET /streamers", () => {
 
   it("should filter by platform", async () => {
     const res = await request(app)
-      .get("/streamers?platform=twitch")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/streamers?platform=twitch");
 
     expect(res.status).toBe(200);
     for (const s of res.body.streamers) {
@@ -225,8 +211,7 @@ describe("GET /streamers", () => {
 
   it("should support pagination", async () => {
     const res = await request(app)
-      .get("/streamers?page=1&limit=1")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/streamers?page=1&limit=1");
 
     expect(res.status).toBe(200);
     expect(res.body.streamers.length).toBeLessThanOrEqual(1);
@@ -241,8 +226,7 @@ describe("GET /streamers", () => {
 describe("GET /streamers/:id", () => {
   it("should return streamer by ID", async () => {
     const res = await request(app)
-      .get(`/streamers/${createdStreamerId}`)
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get(`/streamers/${createdStreamerId}`);
 
     expect(res.status).toBe(200);
     expect(res.body.streamer.id).toBe(createdStreamerId);
@@ -251,8 +235,7 @@ describe("GET /streamers/:id", () => {
 
   it("should return 404 for not-found ID", async () => {
     const res = await request(app)
-      .get("/streamers/nonexistent_id_xyz")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/streamers/nonexistent_id_xyz");
 
     expect(res.status).toBe(404);
   });
@@ -265,8 +248,7 @@ describe("GET /streamers/:id", () => {
 describe("GET /events", () => {
   it("should return events array", async () => {
     const res = await request(app)
-      .get("/events")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/events");
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.events)).toBe(true);
@@ -275,24 +257,21 @@ describe("GET /events", () => {
 
   it("should accept since parameter", async () => {
     const res = await request(app)
-      .get(`/events?since=${new Date().toISOString()}`)
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get(`/events?since=${new Date().toISOString()}`);
 
     expect(res.status).toBe(200);
   });
 
   it("should reject invalid since (400)", async () => {
     const res = await request(app)
-      .get("/events?since=not-a-date")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/events?since=not-a-date");
 
     expect(res.status).toBe(400);
   });
 
   it("should reject limit out of range (400)", async () => {
     const res = await request(app)
-      .get("/events?limit=999")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/events?limit=999");
 
     expect(res.status).toBe(400);
   });
@@ -305,16 +284,14 @@ describe("GET /events", () => {
 describe("DELETE /streamers/:id", () => {
   it("should reject bot key (403)", async () => {
     const res = await request(app)
-      .delete(`/streamers/${createdStreamerId}`)
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`);
+      .delete(`/streamers/${createdStreamerId}`);
 
     expect(res.status).toBe(403);
   });
 
   it("should delete with admin key", async () => {
     const res = await request(app)
-      .delete(`/streamers/${createdStreamerId}`)
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .delete(`/streamers/${createdStreamerId}`);
 
     expect(res.status).toBe(200);
     expect(res.body.message).toContain("deleted");
@@ -322,8 +299,7 @@ describe("DELETE /streamers/:id", () => {
 
   it("should return 404 after deletion", async () => {
     const res = await request(app)
-      .get(`/streamers/${createdStreamerId}`)
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get(`/streamers/${createdStreamerId}`);
 
     expect(res.status).toBe(404);
   });

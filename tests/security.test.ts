@@ -1,12 +1,11 @@
-/**
+﻿/**
  * Security Tests
  *
  * Tests all security layers:
- * 1. API key authentication (missing, invalid, valid)
- * 2. Role-based access control (admin vs bot)
- * 3. IP whitelist enforcement
- * 4. Request validation
- * 5. Rate limiting headers
+ * 1. IP whitelist enforcement
+ * 2. Rate limiting headers
+ * 3. Security headers (Helmet)
+ * 4. Input validation
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -14,8 +13,6 @@ import request from "supertest";
 
 // ─── Set env BEFORE any app imports ───
 process.env.NODE_ENV = "development";
-process.env.ADMIN_API_KEY = "sec_admin_key_xxx";
-process.env.BOT_API_KEY = "sec_bot_key_yyy";
 process.env.DISABLE_IP_WHITELIST = "true";
 process.env.LOG_LEVEL = "error";
 
@@ -35,141 +32,21 @@ afterAll(async () => {
 });
 
 // ═══════════════════════════════════════
-//  1. Authentication - Missing API Key
-// ═══════════════════════════════════════
-
-describe("Authentication: Missing API Key", () => {
-  it("GET /streamers without auth → 401", async () => {
-    const res = await request(app).get("/streamers");
-    expect(res.status).toBe(401);
-    expect(res.body.error).toContain("Missing authorization");
-  });
-
-  it("POST /streamers without auth → 401", async () => {
-    const res = await request(app)
-      .post("/streamers")
-      .send({ platform: "twitch", username: "test", userId: "test" });
-    expect(res.status).toBe(401);
-  });
-
-  it("GET /events without auth → 401", async () => {
-    const res = await request(app).get("/events");
-    expect(res.status).toBe(401);
-  });
-
-  it("DELETE /streamers/:id without auth → 401", async () => {
-    const res = await request(app).delete("/streamers/someid");
-    expect(res.status).toBe(401);
-  });
-});
-
-// ═══════════════════════════════════════
-//  2. Authentication - Wrong API Key
-// ═══════════════════════════════════════
-
-describe("Authentication: Wrong API Key", () => {
-  it("should reject completely wrong key → 403", async () => {
-    const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", "Bearer completely_wrong_key");
-
-    expect(res.status).toBe(403);
-    expect(res.body.error).toContain("Invalid API key");
-  });
-
-  it("should reject malformed bearer format → 401", async () => {
-    const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", "Token some_key");
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toContain("Invalid authorization format");
-  });
-
-  it("should reject bearer without token → 401", async () => {
-    const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", "Bearer");
-
-    expect(res.status).toBe(401);
-  });
-});
-
-// ═══════════════════════════════════════
-//  3. Role-Based Access Control
-// ═══════════════════════════════════════
-
-describe("Role-Based Access Control", () => {
-  it("bot key CAN read streamers", async () => {
-    const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`);
-
-    expect(res.status).toBe(200);
-  });
-
-  it("bot key CANNOT create streamers", async () => {
-    const res = await request(app)
-      .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`)
-      .send({
-        platform: "twitch",
-        username: "sectest",
-        userId: "sec_user",
-      });
-
-    expect(res.status).toBe(403);
-    expect(res.body.error).toContain("insufficient permissions");
-  });
-
-  it("bot key CANNOT delete streamers", async () => {
-    const res = await request(app)
-      .delete("/streamers/someid")
-      .set("Authorization", `Bearer ${process.env.BOT_API_KEY}`);
-
-    expect(res.status).toBe(403);
-  });
-
-  it("admin key CAN create streamers", async () => {
-    const uniqueUsername = `secadmin_${Date.now()}`;
-    const res = await request(app)
-      .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
-      .send({
-        platform: "youtube",
-        username: uniqueUsername,
-        userId: "sec_user_admin",
-      });
-
-    expect(res.status).toBe(201);
-  });
-
-  it("admin key CAN read streamers", async () => {
-    const res = await request(app)
-      .get("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
-
-    expect(res.status).toBe(200);
-  });
-});
-
-// ═══════════════════════════════════════
-//  4. IP Whitelist
+//  1. IP Whitelist
 // ═══════════════════════════════════════
 
 describe("IP Whitelist", () => {
   it("should pass when DISABLE_IP_WHITELIST=true", async () => {
     // Already set in env - events should be accessible
     const res = await request(app)
-      .get("/events")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`);
+      .get("/events");
 
     expect(res.status).toBe(200);
   });
 });
 
 // ═══════════════════════════════════════
-//  5. Rate Limiting Headers
+//  2. Rate Limiting Headers
 // ═══════════════════════════════════════
 
 describe("Rate Limiting", () => {
@@ -185,7 +62,7 @@ describe("Rate Limiting", () => {
 });
 
 // ═══════════════════════════════════════
-//  6. Security Headers (Helmet)
+//  3. Security Headers (Helmet)
 // ═══════════════════════════════════════
 
 describe("Security Headers", () => {
@@ -205,14 +82,13 @@ describe("Security Headers", () => {
 });
 
 // ═══════════════════════════════════════
-//  7. Input Validation
+//  4. Input Validation
 // ═══════════════════════════════════════
 
 describe("Input Validation", () => {
   it("should reject empty body on POST /streamers", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({});
 
     expect(res.status).toBe(400);
@@ -221,7 +97,6 @@ describe("Input Validation", () => {
   it("should reject username with special chars", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "<script>alert(1)</script>",
@@ -234,7 +109,6 @@ describe("Input Validation", () => {
   it("should reject username longer than 50 chars", async () => {
     const res = await request(app)
       .post("/streamers")
-      .set("Authorization", `Bearer ${process.env.ADMIN_API_KEY}`)
       .send({
         platform: "twitch",
         username: "a".repeat(51),
