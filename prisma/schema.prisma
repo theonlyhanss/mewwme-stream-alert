@@ -59,10 +59,10 @@ model StreamEvent {
   streamerId String
   streamer   Streamer @relation(fields: [streamerId], references: [id], onDelete: Cascade)
 
-  title          String?
-  thumbnail      String?
-  profileImage   String?
-  url            String?
+  title          String?  @db.Text
+  thumbnail      String?  @db.Text
+  profileImage   String?  @db.Text
+  url            String?  @db.Text
   notifiedGuilds Json     @default("[]")
 
   startedAt  DateTime
