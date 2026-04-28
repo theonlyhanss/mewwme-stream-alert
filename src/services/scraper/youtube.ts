@@ -129,11 +129,37 @@ export async function checkLive(username: string): Promise<LiveCheckResult> {
     const thumbnails = owner?.thumbnail?.thumbnails;
     const profileImage = thumbnails?.[thumbnails.length - 1]?.url;
 
-    // Extract video ID for thumbnail
-    const videoIdMatch = html.match(/"videoId":"([^"]+)"/);
-    const videoId = videoIdMatch?.[1];
+    // Extract video ID using anchors specific to the current video
+    // to avoid matching recommended/autoplay video IDs in the HTML
+    let videoId: string | undefined;
+
+    const updatedMetaMatch = html.match(/"updatedMetadataEndpoint":\{"videoId":"([^"]+)"/);
+    if (updatedMetaMatch) {
+      videoId = updatedMetaMatch[1];
+    }
+
+    if (!videoId) {
+      const likeMatch = html.match(/"likeEndpoint":\{"status":"LIKE","target":\{"videoId":"([^"]+)"/);
+      if (likeMatch) {
+        videoId = likeMatch[1];
+      }
+    }
+
+    if (!videoId) {
+      const watchMatch = html.match(/\/watch\?v=([^"\\]+)"[^}]*?"watchEndpoint":\{"videoId":"([^"]+)"/);
+      if (watchMatch && watchMatch[1] === watchMatch[2]) {
+        videoId = watchMatch[1];
+      }
+    }
+
+    if (!videoId) {
+      const fallbackMatch = html.match(/"videoId":"([^"]+)"/);
+      videoId = fallbackMatch?.[1];
+    }
+
+    // maxresdefault_live.jpg updates in real-time during the stream
     const thumbnail = videoId
-      ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+      ? `https://i.ytimg.com/vi/${videoId}/maxresdefault_live.jpg`
       : undefined;
 
     const streamUrl = videoId
